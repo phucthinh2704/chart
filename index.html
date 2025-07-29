@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="vi">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard Báo cáo Tổng quan</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				min-height: 100vh;
+				padding: 20px;
+			}
+
+			.dashboard {
+				max-width: 1400px;
+				margin: 0 auto;
+				background: rgba(255, 255, 255, 0.95);
+				border-radius: 20px;
+				padding: 30px;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+				backdrop-filter: blur(10px);
+			}
+
+			.header {
+				text-align: center;
+				margin-bottom: 40px;
+				padding-bottom: 20px;
+				border-bottom: 2px solid #e0e0e0;
+			}
+
+			.header h1 {
+				color: #2c3e50;
+				font-size: 2.5rem;
+				margin-bottom: 10px;
+				font-weight: 700;
+			}
+
+			.header p {
+				color: #7f8c8d;
+				font-size: 1.1rem;
+			}
+
+			.time-filter {
+				display: flex;
+				justify-content: center;
+				gap: 15px;
+				margin-bottom: 30px;
+			}
+
+			.filter-btn {
+				padding: 10px 20px;
+				border: 2px solid #3498db;
+				background: white;
+				color: #3498db;
+				border-radius: 25px;
+				cursor: pointer;
+				font-weight: 600;
+				transition: all 0.3s ease;
+			}
+
+			.filter-btn:hover,
+			.filter-btn.active {
+				background: #3498db;
+				color: white;
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+			}
+
+			.kpi-cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 20px;
+				margin-bottom: 40px;
+			}
+
+			.kpi-card {
+                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				color: white;
+				padding: 25px;
+				border-radius: 15px;
+				text-align: center;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+				transition: transform 0.3s ease;
+			}
+
+			.kpi-card:hover {
+				transform: translateY(-5px);
+			}
+
+			.kpi-card h3 {
+				font-size: 1.1rem;
+				margin-bottom: 10px;
+				opacity: 0.9;
+			}
+
+			.kpi-value {
+				font-size: 2.2rem;
+				font-weight: 700;
+				margin-bottom: 5px;
+			}
+
+			.kpi-change {
+				font-size: 0.9rem;
+				opacity: 0.8;
+			}
+
+			.kpi-change.positive {
+				color: #2ecc71;
+			}
+
+			.kpi-change.negative {
+				color: #e74c3c;
+			}
+
+			.charts-container {
+				display: grid;
+				grid-template-columns: 2fr 1fr;
+				gap: 30px;
+				margin-bottom: 30px;
+			}
+
+			.chart-card {
+				background: white;
+				padding: 25px;
+				border-radius: 15px;
+				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+				border: 1px solid #e0e0e0;
+			}
+
+			.chart-title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				margin-bottom: 20px;
+				color: #2c3e50;
+				text-align: center;
+			}
+
+			.chart-container {
+				position: relative;
+				height: 300px;
+			}
+
+			.bottom-charts {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 30px;
+			}
+
+			.route-chart {
+				height: 350px;
+			}
+
+			.payment-chart {
+				height: 350px;
+			}
+
+			@media (max-width: 768px) {
+				.charts-container {
+					grid-template-columns: 1fr;
+				}
+
+				.bottom-charts {
+					grid-template-columns: 1fr;
+				}
+
+				.kpi-cards {
+					grid-template-columns: 1fr;
+				}
+
+				.header h1 {
+					font-size: 2rem;
+				}
+			}
+
+			.loading {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 200px;
+				font-size: 1.2rem;
+				color: #7f8c8d;
+			}
+
+			.export-btn {
+				background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+				color: white;
+				padding: 12px 25px;
+				border: none;
+				border-radius: 25px;
+				cursor: pointer;
+				font-weight: 600;
+				margin-top: 20px;
+				transition: all 0.3s ease;
+			}
+
+			.export-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+			}
+			.dashboard > .header {
+                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				padding: 20px 0;
+				box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.dashboard > .header > .nav {
+				display: flex;
+				justify-content: center;
+				gap: 30px;
+			}
+
+			.dashboard > .header >.nav a {
+				color: white;
+				text-decoration: none;
+				font-size: 30px;
+				font-weight: 500;
+				padding: 12px 25px;
+				border-radius: 25px;
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.dashboard > .header >.nav a::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.1);
+				transition: left 0.4s ease;
+			}
+
+			.dashboard > .header > .nav a:hover::before {
+				left: 0;
+			}
+
+			.dashboard > .header.nav a:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="dashboard">
+			<header class="header">
+				<nav class="nav">
+					<a href="./index.html">Tổng quan</a>
+					<a href="./analysis_customer.html">Khách hàng</a>
+					<a href="./statistic_ticket_time.html">Vé</a>
+				</nav>
+			</header>
+			<div class="header" >
+				<h1 style="color: white;">📊 Dashboard Báo cáo Tổng quan</h1>
+				<p style="color: white;">
+					Hệ thống quản lý nhà xe - Theo dõi KPI và hiệu suất kinh
+					doanh
+				</p>
+			</div>
+
+			<div class="time-filter">
+				<button
+					class="filter-btn active"
+					onclick="changeTimeFilter('day')">
+					Hôm nay
+				</button>
+				<button
+					class="filter-btn"
+					onclick="changeTimeFilter('week')">
+					Tuần này
+				</button>
+				<button
+					class="filter-btn"
+					onclick="changeTimeFilter('month')">
+					Tháng này
+				</button>
+				<button
+					class="filter-btn"
+					onclick="changeTimeFilter('quarter')">
+					Quý này
+				</button>
+			</div>
+
+			<div class="kpi-cards">
+				<div class="kpi-card">
+					<h3>💰 Tổng Doanh Thu</h3>
+					<div
+						class="kpi-value"
+						id="revenue">
+						2,450,000₫
+					</div>
+					<div class="kpi-change positive">+12.5% so với hôm qua</div>
+				</div>
+				<div class="kpi-card">
+					<h3>🎫 Số Vé Đã Bán</h3>
+					<div
+						class="kpi-value"
+						id="tickets">
+						1,247
+					</div>
+					<div class="kpi-change positive">+8.3% so với hôm qua</div>
+				</div>
+				<div class="kpi-card">
+					<h3>🚌 Tỷ Lệ Lấp Đầy</h3>
+					<div
+						class="kpi-value"
+						id="occupancy">
+						78.5%
+					</div>
+					<div class="kpi-change negative">-2.1% so với hôm qua</div>
+				</div>
+				<div class="kpi-card">
+					<h3>📈 Số Chuyến Xe</h3>
+					<div
+						class="kpi-value"
+						id="trips">
+						156
+					</div>
+					<div class="kpi-change positive">+5.2% so với hôm qua</div>
+				</div>
+			</div>
+
+			<div class="charts-container">
+				<div class="chart-card">
+					<h3 class="chart-title">
+						📈 Biểu Đồ Doanh Thu Theo Thời Gian
+					</h3>
+					<div class="chart-container">
+						<canvas id="revenueChart"></canvas>
+					</div>
+				</div>
+
+				<div class="chart-card">
+					<h3 class="chart-title">🥧 Phương Thức Thanh Toán</h3>
+					<div class="chart-container">
+						<canvas id="paymentChart"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<div class="bottom-charts">
+				<div class="chart-card">
+					<h3 class="chart-title">🛣️ Số Vé Bán Theo Tuyến Đường</h3>
+					<div class="chart-container route-chart">
+						<canvas id="routeChart"></canvas>
+					</div>
+				</div>
+
+				<div class="chart-card">
+					<h3 class="chart-title">⏰ Doanh Thu Theo Giờ</h3>
+					<div class="chart-container">
+						<canvas id="hourlyChart"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<div style="text-align: center">
+				<button
+					class="export-btn"
+					onclick="exportReport()">
+					📊 Xuất Báo Cáo
+				</button>
+			</div>
+		</div>
+
+		<script>
+			// Dữ liệu mẫu
+			const sampleData = {
+				day: {
+					revenue: [
+						"6:00",
+						"8:00",
+						"10:00",
+						"12:00",
+						"14:00",
+						"16:00",
+						"18:00",
+						"20:00",
+					],
+					revenueValues: [
+						120000, 320000, 280000, 450000, 380000, 420000, 350000,
+						125000,
+					],
+					kpis: {
+						revenue: "2,450,000₫",
+						tickets: "1,247",
+						occupancy: "78.5%",
+						trips: "156",
+					},
+				},
+				week: {
+					revenue: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
+					revenueValues: [
+						2200000, 2450000, 2680000, 2850000, 3200000, 2900000,
+						2100000,
+					],
+					kpis: {
+						revenue: "18,380,000₫",
+						tickets: "9,847",
+						occupancy: "82.3%",
+						trips: "1,156",
+					},
+				},
+				month: {
+					revenue: ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"],
+					revenueValues: [18380000, 22450000, 19680000, 21850000],
+					kpis: {
+						revenue: "82,360,000₫",
+						tickets: "42,847",
+						occupancy: "79.8%",
+						trips: "4,856",
+					},
+				},
+				quarter: {
+					revenue: ["Tháng 1", "Tháng 2", "Tháng 3"],
+					revenueValues: [82360000, 95450000, 88680000],
+					kpis: {
+						revenue: "266,490,000₫",
+						tickets: "152,847",
+						occupancy: "81.2%",
+						trips: "15,256",
+					},
+				},
+			};
+
+			let currentFilter = "day";
+			let charts = {};
+
+			// Khởi tạo biểu đồ
+			function initCharts() {
+				// Biểu đồ doanh thu theo thời gian
+				const revenueCtx = document
+					.getElementById("revenueChart")
+					.getContext("2d");
+				charts.revenue = new Chart(revenueCtx, {
+					type: "line",
+					data: {
+						labels: sampleData[currentFilter].revenue,
+						datasets: [
+							{
+								label: "Doanh thu (₫)",
+								data: sampleData[currentFilter].revenueValues,
+								borderColor: "#3498db",
+								backgroundColor: "rgba(52, 152, 219, 0.1)",
+								borderWidth: 3,
+								fill: true,
+								tension: 0.4,
+								pointBackgroundColor: "#3498db",
+								pointBorderColor: "#fff",
+								pointBorderWidth: 2,
+								pointRadius: 6,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: false,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									callback: function (value) {
+										return (
+											new Intl.NumberFormat(
+												"vi-VN"
+											).format(value) + "₫"
+										);
+									},
+								},
+							},
+						},
+					},
+				});
+
+				// Biểu đồ phương thức thanh toán
+				const paymentCtx = document
+					.getElementById("paymentChart")
+					.getContext("2d");
+				charts.payment = new Chart(paymentCtx, {
+					type: "doughnut",
+					data: {
+						labels: [
+							"Tiền mặt",
+							"Thẻ tín dụng",
+							"Ví điện tử",
+							"Chuyển khoản",
+						],
+						datasets: [
+							{
+								data: [45, 25, 20, 10],
+								backgroundColor: [
+									"#e74c3c",
+									"#3498db",
+									"#2ecc71",
+									"#f39c12",
+								],
+								borderWidth: 0,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "bottom",
+							},
+						},
+					},
+				});
+
+				// Biểu đồ vé bán theo tuyến đường
+				const routeCtx = document
+					.getElementById("routeChart")
+					.getContext("2d");
+				charts.route = new Chart(routeCtx, {
+					type: "bar",
+					data: {
+						labels: [
+							"HCM-Cần Thơ",
+							"HCM-Vũng Tàu",
+							"HCM-Đà Lạt",
+							"HCM-Nha Trang",
+							"HCM-Phan Thiết",
+						],
+						datasets: [
+							{
+								label: "Số vé đã bán",
+								data: [320, 280, 180, 150, 120],
+								backgroundColor: [
+									"#3498db",
+									"#2ecc71",
+									"#e74c3c",
+									"#f39c12",
+									"#9b59b6",
+								],
+								borderRadius: 5,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: false,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+							},
+						},
+					},
+				});
+
+				// Biểu đồ doanh thu theo giờ
+				const hourlyCtx = document
+					.getElementById("hourlyChart")
+					.getContext("2d");
+				charts.hourly = new Chart(hourlyCtx, {
+					type: "bar",
+					data: {
+						labels: [
+							"6h-9h",
+							"9h-12h",
+							"12h-15h",
+							"15h-18h",
+							"18h-21h",
+						],
+						datasets: [
+							{
+								label: "Doanh thu (₫)",
+								data: [450000, 680000, 520000, 780000, 420000],
+								backgroundColor: "rgba(52, 152, 219, 0.8)",
+								borderRadius: 5,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: false,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									callback: function (value) {
+										return (
+											new Intl.NumberFormat(
+												"vi-VN"
+											).format(value) + "₫"
+										);
+									},
+								},
+							},
+						},
+					},
+				});
+			}
+
+			// Thay đổi bộ lọc thời gian
+			function changeTimeFilter(filter) {
+				currentFilter = filter;
+
+				// Cập nhật UI
+				document.querySelectorAll(".filter-btn").forEach((btn) => {
+					btn.classList.remove("active");
+				});
+				event.target.classList.add("active");
+
+				// Cập nhật KPI
+				updateKPIs();
+
+				// Cập nhật biểu đồ doanh thu
+				updateRevenueChart();
+			}
+
+			// Cập nhật KPI
+			function updateKPIs() {
+				const data = sampleData[currentFilter].kpis;
+				document.getElementById("revenue").textContent = data.revenue;
+				document.getElementById("tickets").textContent = data.tickets;
+				document.getElementById("occupancy").textContent =
+					data.occupancy;
+				document.getElementById("trips").textContent = data.trips;
+			}
+
+			// Cập nhật biểu đồ doanh thu
+			function updateRevenueChart() {
+				const data = sampleData[currentFilter];
+				charts.revenue.data.labels = data.revenue;
+				charts.revenue.data.datasets[0].data = data.revenueValues;
+				charts.revenue.update();
+			}
+
+			// Xuất báo cáo
+			function exportReport() {
+				alert(
+					"Chức năng xuất báo cáo sẽ được triển khai trong phiên bản tiếp theo!"
+				);
+			}
+
+			// Khởi tạo khi trang được tải
+			document.addEventListener("DOMContentLoaded", function () {
+				initCharts();
+			});
+		</script>
+	</body>
+</html>
