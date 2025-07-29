@@ -6,6 +6,10 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0" />
 		<title>Dashboard Báo cáo Tổng quan</title>
+		<link
+			rel="shortcut icon"
+			href="./images//dashboard.png"
+			type="image/x-icon" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 		<style>
 			* {
@@ -16,7 +20,7 @@
 
 			body {
 				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				background: linear-gradient(135deg, #74b9ff, #0984e3);
 				min-height: 100vh;
 				padding: 20px;
 			}
@@ -64,8 +68,9 @@
 				color: #3498db;
 				border-radius: 25px;
 				cursor: pointer;
-				font-weight: 600;
+				font-weight: 700;
 				transition: all 0.3s ease;
+				font-size: 22px;
 			}
 
 			.filter-btn:hover,
@@ -84,7 +89,7 @@
 			}
 
 			.kpi-card {
-                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				background: #0370c4;
 				color: white;
 				padding: 25px;
 				border-radius: 15px;
@@ -98,20 +103,21 @@
 			}
 
 			.kpi-card h3 {
-				font-size: 1.1rem;
+				font-size: 26px;
 				margin-bottom: 10px;
 				opacity: 0.9;
 			}
 
 			.kpi-value {
-				font-size: 2.2rem;
+				font-size: 2.5rem;
 				font-weight: 700;
 				margin-bottom: 5px;
 			}
 
 			.kpi-change {
-				font-size: 0.9rem;
+				font-size: 1.1em;
 				opacity: 0.8;
+				font-weight: bold;
 			}
 
 			.kpi-change.positive {
@@ -135,10 +141,11 @@
 				border-radius: 15px;
 				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
 				border: 1px solid #e0e0e0;
+				font-size: 2rem;
 			}
 
 			.chart-title {
-				font-size: 1.3rem;
+				font-size: 2rem;
 				font-weight: 600;
 				margin-bottom: 20px;
 				color: #2c3e50;
@@ -153,7 +160,7 @@
 			.bottom-charts {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
-				gap: 30px;
+				gap: 25px;
 			}
 
 			.route-chart {
@@ -201,16 +208,22 @@
 				font-weight: 600;
 				margin-top: 20px;
 				transition: all 0.3s ease;
+				font-size: 22px;
 			}
 
 			.export-btn:hover {
 				transform: translateY(-2px);
 				box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
 			}
+
 			.dashboard > .header {
-                background: linear-gradient(135deg, #74b9ff, #0984e3);
+				background: linear-gradient(135deg, #74b9ff, #0984e3);
 				padding: 20px 0;
 				box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+				text-align: center;
+				margin-bottom: 40px;
+				padding-bottom: 20px;
+				border-bottom: 2px solid #e0e0e0;
 			}
 
 			.dashboard > .header > .nav {
@@ -219,7 +232,7 @@
 				gap: 30px;
 			}
 
-			.dashboard > .header >.nav a {
+			.dashboard > .header > .nav a {
 				color: white;
 				text-decoration: none;
 				font-size: 30px;
@@ -231,7 +244,7 @@
 				overflow: hidden;
 			}
 
-			.dashboard > .header >.nav a::before {
+			.dashboard > .header > .nav a::before {
 				content: "";
 				position: absolute;
 				top: 0;
@@ -262,9 +275,14 @@
 					<a href="./statistic_ticket_time.html">Vé</a>
 				</nav>
 			</header>
-			<div class="header" >
-				<h1 style="color: white;">📊 Dashboard Báo cáo Tổng quan</h1>
-				<p style="color: white;">
+
+			<div
+				class="header"
+				style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4)">
+				<h1 style="color: white; font-size: 50px">
+					📊 Dashboard Báo cáo Tổng quan
+				</h1>
+				<p style="color: white; font-size: 26px">
 					Hệ thống quản lý nhà xe - Theo dõi KPI và hiệu suất kinh
 					doanh
 				</p>
